@@ -1,12 +1,14 @@
+import email
 from django.shortcuts import render
 from django.views.generic import ListView
-from job.models import Job
+from job.models import Company, Job
 from django.db.models import Q
-from django.views.generic import CreateView
-from job.models import Company
 from home.forms import CompanyForm
-from django.contrib import messages
-
+from django.views.generic import CreateView
+from accounts.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 
 # Create your views here.
 
@@ -47,11 +49,18 @@ class HomePageView(ListView):
         )
 
 
-class CompanyPageView(CreateView):
-    model = Company
+class CompanyPageView(LoginRequiredMixin, CreateView):
+    template_name = "company.html"
+    context_object_name = "form"
+    model = User
     form_class = CompanyForm
-    template_name = "a.html"
+    success_url = reverse_lazy("home:home")
 
     def form_valid(self, form):
-        messages.success("save sucess fully")
-        return super().form_valid(form)
+
+        user = get_object_or_404(User, email=self.request.user.email)
+        setUser = form.save(commit=False)
+        setUser.user = user
+        setUser.save()
+
+        return super(CompanyPageView, self).form_valid(form)

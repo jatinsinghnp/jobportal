@@ -1,7 +1,5 @@
 from django.db import models
 from accounts.models import User
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 GENDER = [
     ("Male", "Male"),
@@ -29,7 +27,7 @@ STATUS = [
 
 
 class Company(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     phone = models.CharField(max_length=10)
     image = models.ImageField(upload_to="")
     gender = models.CharField(max_length=50, choices=GENDER)
@@ -61,7 +59,6 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
-    
 
 
 class Application(models.Model):
@@ -73,5 +70,3 @@ class Application(models.Model):
 
     def __str__(self):
         return str(self.applicant)
-
-
